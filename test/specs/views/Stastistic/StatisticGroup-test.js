@@ -10,7 +10,7 @@ describe('StatisticGroup', () => {
   common.hasUIClassName(StatisticGroup)
   common.rendersChildren(StatisticGroup)
 
-  common.implementsWidthProp(StatisticGroup, _.without(SUI.SIZES, 'big', 'massive', 'medium'), {
+  common.implementsWidthProp(StatisticGroup, SUI.WIDTHS, {
     canEqual: false,
     propKey: 'widths',
   })
