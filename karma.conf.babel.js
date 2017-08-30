@@ -22,6 +22,7 @@ const formatError = (msg) => {
 }
 
 const basePath = __dirname
+const { paths } = config
 
 export default (karmaConfig) => {
   karmaConfig.set({
@@ -48,6 +49,7 @@ export default (karmaConfig) => {
       { pattern: 'docs/app/logo.png', watched: false, included: false, served: true },
       { pattern: 'docs/app/assets/**/*.jpg', watched: false, included: false, served: true },
       { pattern: 'docs/app/assets/**/*.png', watched: false, included: false, served: true },
+      'node_modules/es6-shim/es6-shim.js',
       'test/tests.bundle.js',
     ],
     formatError,
@@ -70,7 +72,7 @@ export default (karmaConfig) => {
       'test/tests.bundle.js': ['webpack'],
     },
     webpack: {
-      entry: './test/tests.bundle.js',
+      entry: 'test/tests.bundle.js',
       externals: {
         ...webpackConfig.externals,
         // These are internal deps specific to React 0.13 required() by enzyme
