@@ -1,5 +1,5 @@
-const webpack = require('webpack')
-const config = require('./config')
+import webpack from 'webpack'
+import config from './config'
 
 const { paths } = config
 const webpackDllConfig = { module: {} }
@@ -16,7 +16,7 @@ webpackDllConfig.entry = {
 // ------------------------------------
 webpackDllConfig.output = {
   path: paths.dll(),
-  filename: `dll.[name].[${config.compiler_hash_type}].js`,
+  filename: 'dll.[name].js',
   library: '[name]_[hash]',
 }
 
@@ -30,4 +30,4 @@ webpackDllConfig.plugins = [
   }),
 ]
 
-module.exports = webpackDllConfig
+export default webpackDllConfig

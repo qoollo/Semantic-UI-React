@@ -1,8 +1,10 @@
 import cx from 'classnames'
 import _ from 'lodash'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
+  childrenUtils,
   createShorthandFactory,
   customPropTypes,
   getUnhandledProps,
@@ -31,7 +33,7 @@ function BreadcrumbDivider(props) {
 
   return (
     <ElementType {...rest} className={classes}>
-      {_.isNil(children) ? '/' : children}
+      {childrenUtils.isNil(children) ? '/' : children}
     </ElementType>
   )
 }

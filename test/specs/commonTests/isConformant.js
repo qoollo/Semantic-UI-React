@@ -5,14 +5,16 @@ import ReactDOMServer from 'react-dom/server'
 import * as semanticUIReact from 'semantic-ui-react'
 
 import { META } from 'src/lib'
+import { consoleUtil, sandbox, syntheticEvent } from 'test/utils'
 import helpers from './commonHelpers'
 import componentInfo from './componentInfo'
-import { consoleUtil, sandbox, syntheticEvent } from 'test/utils'
+import hasValidTypings from './hasValidTypings'
 
 /**
  * Assert Component conforms to guidelines that are applicable to all components.
  * @param {React.Component|Function} Component A component that should conform.
  * @param {Object} [options={}]
+ * @param {array} [options.ignoredTypingsProps=[]] Props that will be ignored in typings tests.
  * @param {Object} [options.eventTargets={}] Map of events and the child component to target.
  * @param {Object} [options.requiredProps={}] Props required to render Component without errors or warnings.
  */
@@ -30,12 +32,13 @@ export default (Component, options = {}) => {
   }
 
   // extract componentInfo for this component
+  const extractedInfo = _.find(componentInfo, i => i.constructorName === Component.prototype.constructor.name)
   const {
     _meta,
     constructorName,
     componentClassName,
     filenameWithoutExt,
-  } = _.find(componentInfo, i => i.constructorName === Component.prototype.constructor.name)
+  } = extractedInfo
 
   // ----------------------------------------
   // Class and file name
@@ -73,13 +76,13 @@ export default (Component, options = {}) => {
       expect(isTopLevelAPIProp).to.equal(
         false,
         `"${constructorName}" is private (starts with  "_").` +
-        ' It cannot be exposed on the top level API'
+        ' It cannot be exposed on the top level API',
       )
 
       expect(isSubComponent).to.equal(
         false,
         `"${constructorName}" is private (starts with "_").` +
-        ' It cannot be a static prop of another component (sub-component)'
+        ' It cannot be a static prop of another component (sub-component)',
       )
     })
   } else {
@@ -97,7 +100,7 @@ export default (Component, options = {}) => {
       expect(isSubComponent).to.equal(
         true,
         `\`${constructorName}\` is a child component (has a _meta.parent).` +
-        ` It must be a static prop of its parent \`${_meta.parent}\``
+        ` It must be a static prop of its parent \`${_meta.parent}\``,
       )
     })
   }
@@ -155,7 +158,7 @@ export default (Component, options = {}) => {
     })
 
     it('renders as a ReactClass or passes "as" to the next component', () => {
-      class MyComponent extends React.Component {
+      class MyComponent extends React.Component { // eslint-disable-line react/prefer-stateless-function
         render() {
           return <div data-my-react-class />
         }
@@ -196,7 +199,7 @@ export default (Component, options = {}) => {
 
       Component.handledProps.should.to.deep.equal(expectedProps,
         'It seems that not all props were defined in Component.handledProps, you need to check that they are equal ' +
-        'to the union of Component.autoControlledProps and keys of Component.defaultProps and Component.propTypes'
+        'to the union of Component.autoControlledProps and keys of Component.defaultProps and Component.propTypes',
       )
     })
   })
@@ -214,7 +217,7 @@ export default (Component, options = {}) => {
     // This test catches the case where a developer forgot to call the event prop
     // after handling it internally. It also catch cases where the synthetic event was not passed back.
     _.each(syntheticEvent.types, ({ eventShape, listeners }) => {
-      _.each(listeners, listenerName => {
+      _.each(listeners, (listenerName) => {
         // onKeyDown => keyDown
         const eventName = _.camelCase(listenerName.replace('on', ''))
 
@@ -248,7 +251,7 @@ export default (Component, options = {}) => {
         handlerSpy.calledOnce.should.equal(true,
           `<${constructorName} ${listenerName}={${handlerName}} />\n` +
           `${leftPad} ^ was not called once on "${eventName}".` +
-          'You may need to hoist your event handlers up to the root element.\n'
+          'You may need to hoist your event handlers up to the root element.\n',
         )
 
         let expectedArgs = [eventShape]
@@ -260,12 +263,12 @@ export default (Component, options = {}) => {
         }
 
         // Components should return the event first, then any data
-        handlerSpy.calledWithMatch(...expectedArgs).should.equal(true,
-          `<${constructorName} ${listenerName}={${handlerName}} />\n` +
-          `${leftPad} ^ ${errorMessage}\n` +
-          'It was called with args:\n' +
-          JSON.stringify(handlerSpy.args, null, 2)
-        )
+        handlerSpy.calledWithMatch(...expectedArgs).should.equal(true, [
+          `<${constructorName} ${listenerName}={${handlerName}} />\n`,
+          `${leftPad} ^ ${errorMessage}`,
+          'It was called with args:',
+          JSON.stringify(handlerSpy.args, null, 2),
+        ].join('\n'))
       })
     })
   })
@@ -339,4 +342,9 @@ export default (Component, options = {}) => {
       })
     })
   })
+
+  // ----------------------------------------
+  // Test typings
+  // ----------------------------------------
+  hasValidTypings(Component, extractedInfo, options)
 }

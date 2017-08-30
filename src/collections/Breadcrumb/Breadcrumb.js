@@ -1,8 +1,10 @@
 import cx from 'classnames'
 import _ from 'lodash'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
+  childrenUtils,
   customPropTypes,
   getUnhandledProps,
   getElementType,
@@ -34,7 +36,7 @@ function Breadcrumb(props) {
   const rest = getUnhandledProps(Breadcrumb, props)
   const ElementType = getElementType(Breadcrumb, props)
 
-  if (!_.isNil(children)) return <ElementType {...rest} className={classes}>{children}</ElementType>
+  if (!childrenUtils.isNil(children)) return <ElementType {...rest} className={classes}>{children}</ElementType>
 
   const childElements = []
 

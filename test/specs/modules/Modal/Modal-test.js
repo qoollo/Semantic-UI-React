@@ -23,7 +23,7 @@ const wrapperShallow = (...args) => (wrapper = shallow(...args))
 const assertBodyClasses = (...rest) => {
   const hasClasses = typeof rest[rest.length - 1] === 'boolean' ? rest.pop() : true
 
-  rest.forEach(className => {
+  rest.forEach((className) => {
     const didFind = document.body.classList.contains(className)
     const message = [
       `document.body ${didFind ? 'has' : 'does not have'} class "${className}".`,
@@ -45,6 +45,18 @@ describe('Modal', () => {
   })
 
   common.hasSubComponents(Modal, [ModalHeader, ModalContent, ModalActions, ModalDescription])
+  common.hasValidTypings(Modal)
+
+  common.implementsShorthandProp(Modal, {
+    propKey: 'header',
+    ShorthandComponent: ModalHeader,
+    mapValueToProps: content => ({ content }),
+  })
+  common.implementsShorthandProp(Modal, {
+    propKey: 'content',
+    ShorthandComponent: ModalContent,
+    mapValueToProps: content => ({ content }),
+  })
 
   // Heads up!
   //
@@ -89,6 +101,40 @@ describe('Modal', () => {
 
     element.style.should.have.property('marginTop', '1em')
     element.style.should.have.property('top', '0px')
+  })
+
+  describe('actions', () => {
+    it('closes the modal on action click', () => {
+      wrapperMount(<Modal actions={['OK']} defaultOpen />)
+
+      assertBodyContains('.ui.modal')
+      domEvent.click('.ui.modal .actions .button')
+      assertBodyContains('.ui.modal', false)
+    })
+
+    it('calls shorthand onActionClick callback', () => {
+      const onActionClick = sandbox.spy()
+      const modalActions = { onActionClick, actions: [{ key: 'ok', content: 'OK' }] }
+      wrapperMount(<Modal actions={modalActions} defaultOpen />)
+
+      onActionClick.should.not.have.been.called()
+      domEvent.click('.ui.modal .actions .button')
+      onActionClick.should.have.been.calledOnce()
+    })
+  })
+
+  describe('onActionClick', () => {
+    it('is called when an action is clicked', () => {
+      const onActionClick = sandbox.spy()
+      const event = { target: null }
+      const props = { actions: ['OK'], defaultOpen: true, onActionClick }
+
+      wrapperMount(<Modal {...props} />)
+      domEvent.click('.ui.modal .actions .button')
+
+      onActionClick.should.have.been.calledOnce()
+      onActionClick.should.have.been.calledWithMatch(event, props)
+    })
   })
 
   describe('open', () => {
@@ -171,9 +217,9 @@ describe('Modal', () => {
 
   describe('size', () => {
     it('adds the size to the modal className', () => {
-      const sizes = ['fullscreen', 'large', 'small']
+      const sizes = ['fullscreen', 'large', 'mini', 'small', 'tiny']
 
-      sizes.forEach(size => {
+      sizes.forEach((size) => {
         wrapperMount(<Modal size={size} open />)
         assertBodyContains(`.ui.${size}.modal`)
       })

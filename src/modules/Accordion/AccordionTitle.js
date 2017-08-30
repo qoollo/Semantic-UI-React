@@ -1,6 +1,7 @@
-import _ from 'lodash'
 import cx from 'classnames'
-import React, { Component, PropTypes } from 'react'
+import _ from 'lodash'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import {
   customPropTypes,
@@ -65,7 +66,7 @@ export default class AccordionTitle extends Component {
     const classes = cx(
       useKeyOnly(active, 'active'),
       'title',
-      className
+      className,
     )
     const rest = getUnhandledProps(AccordionTitle, this.props)
     const ElementType = getElementType(AccordionTitle, this.props)

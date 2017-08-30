@@ -1,5 +1,6 @@
 import _ from 'lodash'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import {
   customPropTypes,
@@ -58,7 +59,7 @@ class Confirm extends Component {
     type: META.TYPES.ADDON,
   }
 
-  handleCancel = e => {
+  handleCancel = (e) => {
     _.invoke(this.props, 'onCancel', e, this.props)
   }
 
