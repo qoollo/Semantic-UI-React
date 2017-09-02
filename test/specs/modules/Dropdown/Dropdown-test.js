@@ -34,7 +34,7 @@ const wrapperRender = (...args) => (wrapper = render(...args))
 // Options
 // ----------------------------------------
 const getOptions = (count = 5) => _.times(count, () => {
-  const text = _.times(3, faker.hacker.noun).join(' ')
+  const text = [count, ..._.times(3, faker.hacker.noun)].join(' ')
   const value = _.snakeCase(text)
   return { text, value }
 })
