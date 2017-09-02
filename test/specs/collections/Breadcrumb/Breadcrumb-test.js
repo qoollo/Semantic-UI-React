@@ -5,7 +5,7 @@ import BreadcrumbDivider from 'src/collections/Breadcrumb/BreadcrumbDivider'
 import BreadcrumbSection from 'src/collections/Breadcrumb/BreadcrumbSection'
 import * as common from 'test/specs/commonTests'
 
-describe('Breadcrumb', () => {
+describe.only('Breadcrumb', () => {
   common.isConformant(Breadcrumb)
   common.hasSubComponents(Breadcrumb, [BreadcrumbDivider, BreadcrumbSection])
   common.hasUIClassName(Breadcrumb)
@@ -17,8 +17,8 @@ describe('Breadcrumb', () => {
   })
 
   const sections = [
-    { content: 'Home', link: true },
-    { content: 'T-Shirt', href: 'google.com' },
+    { key: 'home', content: 'Home', link: true },
+    { key: 't-shirt', content: 'T-Shirt', href: 'google.com' },
   ]
 
   it('renders children with `sections` prop', () => {
