@@ -1,7 +1,13 @@
 import fs from 'fs'
-
+import puppeteerPkg from 'puppeteer/package.json'
+import Downloader from 'puppeteer/utils/ChromiumDownloader'
 import config from './config'
 import webpackConfig from './webpack.config.babel'
+
+const revision = puppeteerPkg.puppeteer.chromium_revision
+const revisionInfo = Downloader.revisionInfo(Downloader.currentPlatform(), revision)
+
+process.env.CHROME_BIN = revisionInfo.executablePath
 
 const formatError = (msg) => {
   // filter out empty lines and node_modules
@@ -27,7 +33,7 @@ const { paths } = config
 export default (karmaConfig) => {
   karmaConfig.set({
     basePath,
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
     browserConsoleLogOptions: {
       level: 'log',
       terminal: true,
@@ -49,12 +55,11 @@ export default (karmaConfig) => {
       { pattern: 'docs/app/logo.png', watched: false, included: false, served: true },
       { pattern: 'docs/app/assets/**/*.jpg', watched: false, included: false, served: true },
       { pattern: 'docs/app/assets/**/*.png', watched: false, included: false, served: true },
-      'node_modules/es6-shim/es6-shim.js',
-      'test/tests.bundle.js',
+      './test/tests.bundle.js',
     ],
     formatError,
-    frameworks: ['phantomjs-shim', 'mocha'],
-    // make karma serve all files that the web server does (/* => /docs/app/*)
+    frameworks: ['mocha'],
+    // make karma serve all files that the web server does: /* => /docs/app/*
     proxies: fs.readdirSync(paths.docsSrc()).reduce((acc, file) => {
       const isDir = fs.statSync(paths.docsSrc(file)).isDirectory()
       const trailingSlash = isDir ? '/' : ''
