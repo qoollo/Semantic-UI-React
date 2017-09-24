@@ -129,12 +129,12 @@ var Modal = function (_Component) {
 
         if (_this.state.scrolling !== scrolling) {
           newState.scrolling = scrolling;
+        }
 
-          if (scrolling) {
-            mountNode.classList.add('scrolling');
-          } else {
-            mountNode.classList.remove('scrolling');
-          }
+        if (scrolling) {
+          mountNode.classList.add('scrolling');
+        } else {
+          mountNode.classList.remove('scrolling');
         }
 
         if (Object.keys(newState).length > 0) _this.setState(newState);
